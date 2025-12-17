@@ -1,0 +1,8 @@
+# Backend env
+backend/.env
+
+# Dependencies
+node_modules
+
+# Build output
+dist
