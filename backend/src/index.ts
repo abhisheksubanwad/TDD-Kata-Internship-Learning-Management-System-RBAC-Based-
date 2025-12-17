@@ -1,1 +1,1 @@
-console.log("Backend setup complete 🚀");
+import "./server";
