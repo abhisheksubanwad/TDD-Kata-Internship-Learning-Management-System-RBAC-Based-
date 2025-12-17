@@ -14,22 +14,22 @@ app.get("/health", (_req: Request, res: Response) => {
 });
 
 // Database connection test
-app.get("/db-test", async (_req: Request, res: Response) => {
-  const { data, error } = await supabase
-    .from("users")
-    .select("id")
-    .limit(1);
+// app.get("/db-test", async (_req: Request, res: Response) => {
+//   const { data, error } = await supabase
+//     .from("users")
+//     .select("id")
+//     .limit(1);
 
-  if (error) {
-    return res.status(500).json({
-      error: error.message
-    });
-  }
+//   if (error) {
+//     return res.status(500).json({
+//       error: error.message
+//     });
+//   }
 
-  return res.status(200).json({
-    message: "Database connected successfully",
-    data
-  });
-});
+//   return res.status(200).json({
+//     message: "Database connected successfully",
+//     data
+//   });
+// });
 
 export default app;
