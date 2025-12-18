@@ -5,7 +5,7 @@ import { authenticate } from "./middleware/auth.middleware";
 import { authorize } from "./middleware/role.middleware";
 import adminRoutes from "./admin/admin.routes";
 import courseRoutes from "./courses/course.routes";
-
+import chapterRoutes from "./chapters/chapter.routes";
 
 const app = express(); // ✅ THIS WAS MISSING
 
@@ -27,6 +27,10 @@ app.get("/health", async (_req: Request, res: Response) => {
     db: "connected",
   });
 });
+
+
+// Chapters routs
+app.use("/api/chapters", chapterRoutes);
 
 // Admin routs
 app.use("/api/admin", adminRoutes);
