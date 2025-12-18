@@ -3,6 +3,8 @@ import authRoutes from "./auth/auth.routes";
 import { supabase } from "./config/supabase";
 import { authenticate } from "./middleware/auth.middleware";
 import { authorize } from "./middleware/role.middleware";
+import adminRoutes from "./admin/admin.routes";
+
 
 const app = express(); // ✅ THIS WAS MISSING
 
@@ -24,6 +26,9 @@ app.get("/health", async (_req: Request, res: Response) => {
     db: "connected",
   });
 });
+
+// Admin
+app.use("/api/admin", adminRoutes);
 
 // 🔹 Auth routes
 app.use("/api/auth", authRoutes);
