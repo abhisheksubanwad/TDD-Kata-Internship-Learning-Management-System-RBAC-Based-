@@ -4,6 +4,7 @@ import { supabase } from "./config/supabase";
 import { authenticate } from "./middleware/auth.middleware";
 import { authorize } from "./middleware/role.middleware";
 import adminRoutes from "./admin/admin.routes";
+import courseRoutes from "./courses/course.routes";
 
 
 const app = express(); // ✅ THIS WAS MISSING
@@ -27,13 +28,16 @@ app.get("/health", async (_req: Request, res: Response) => {
   });
 });
 
-// Admin
+// Admin routs
 app.use("/api/admin", adminRoutes);
 
-// 🔹 Auth routes
+// Course routes
+app.use("/api/courses", courseRoutes);
+
+// Auth routes
 app.use("/api/auth", authRoutes);
 
-// 🔹 RBAC test routes
+// RBAC test routes
 app.get(
   "/api/protected/student",
   authenticate,
