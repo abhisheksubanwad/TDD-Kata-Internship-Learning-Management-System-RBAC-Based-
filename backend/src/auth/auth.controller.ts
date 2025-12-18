@@ -1,18 +1,22 @@
 import { Request, Response } from "express";
-import { registerStudent } from "./auth.service";
+import { registerStudent, loginUser } from "./auth.service";
 
 export async function register(req: Request, res: Response) {
   try {
     const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
-
-    const token = await registerStudent({ name, email, password });
-
-    return res.status(201).json({ token });
+    const user = await registerStudent(name, email, password);
+    res.status(201).json(user);
   } catch (error: any) {
-    return res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });
+  }
+}
+
+export async function login(req: Request, res: Response) {
+  try {
+    const { email, password } = req.body;
+    const result = await loginUser(email, password);
+    res.status(200).json(result);
+  } catch {
+    res.status(401).json({ message: "Invalid credentials" });
   }
 }

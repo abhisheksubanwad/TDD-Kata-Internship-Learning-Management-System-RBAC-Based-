@@ -1,52 +1,57 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { supabase } from "../config/supabase";
-import { generateToken } from "./jwt";
+import { JwtPayload } from "./auth.types";
 
-interface RegisterInput {
-  name: string;
-  email: string;
-  password: string;
-}
+const JWT_SECRET = process.env.JWT_SECRET!;
 
-export async function registerStudent(input: RegisterInput) {
-  const { name, email, password } = input;
+export async function registerStudent(
+  name: string,
+  email: string,
+  password: string
+) {
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  // check if user already exists
-  const { data: existingUser } = await supabase
-    .from("users")
-    .select("id")
-    .eq("email", email)
-    .single();
-
-  if (existingUser) {
-    throw new Error("User already exists");
-  }
-
-  // hash password
-  const passwordHash = await bcrypt.hash(password, 10);
-
-  // insert user
   const { data, error } = await supabase
     .from("users")
     .insert({
       name,
       email,
-      password_hash: passwordHash,
+      password_hash: hashedPassword,
       role: "student",
       is_approved: true
     })
     .select()
     .single();
 
-  if (error || !data) {
-    throw new Error("Failed to create user");
+  if (error) throw error;
+  return data;
+}
+
+export async function loginUser(email: string, password: string) {
+  const { data: user, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("email", email)
+    .single();
+
+  if (error || !user) {
+    throw new Error("Invalid credentials");
   }
 
-  // generate token
-  const token = generateToken({
-    userId: data.id,
-    role: data.role
+  const isMatch = await bcrypt.compare(password, user.password_hash);
+  if (!isMatch) {
+    throw new Error("Invalid credentials");
+  }
+
+  const payload: JwtPayload = {
+    userId: user.id,
+    role: user.role
+  };
+
+  const token = jwt.sign(payload, JWT_SECRET, {
+    expiresIn: "1d"
   });
 
-  return token;
+  return { token, role: user.role };
 }
