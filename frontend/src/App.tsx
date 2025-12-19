@@ -6,17 +6,21 @@ import Mentor from "./pages/Mentor";
 import Admin from "./pages/Admin";
 import Unauthorized from "./pages/Unauthorized";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <BrowserRouter>
+      {/* Navbar is here */}
+      <Navbar />
+
       <Routes>
-        {/* Public */}
+        {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
 
-        {/* Protected */}
+        {/* Student */}
         <Route
           path="/student"
           element={
@@ -26,6 +30,7 @@ function App() {
           }
         />
 
+        {/* Mentor */}
         <Route
           path="/mentor"
           element={
@@ -35,6 +40,7 @@ function App() {
           }
         />
 
+        {/* Admin */}
         <Route
           path="/admin"
           element={
