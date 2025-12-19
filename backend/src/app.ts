@@ -6,8 +6,10 @@ import { authorize } from "./middleware/role.middleware";
 import adminRoutes from "./admin/admin.routes";
 import courseRoutes from "./courses/course.routes";
 import chapterRoutes from "./chapters/chapter.routes";
+import enrollmentRoutes from "./enrollments/enrollment.routes";
 
-const app = express(); // ✅ THIS WAS MISSING
+
+const app = express(); 
 
 app.use(express.json());
 
@@ -28,6 +30,8 @@ app.get("/health", async (_req: Request, res: Response) => {
   });
 });
 
+// Enrollments routs
+app.use("/api/enrollments", enrollmentRoutes);
 
 // Chapters routs
 app.use("/api/chapters", chapterRoutes);
