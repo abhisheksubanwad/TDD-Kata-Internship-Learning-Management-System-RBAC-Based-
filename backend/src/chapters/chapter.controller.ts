@@ -2,10 +2,7 @@ import { Response } from "express";
 import { supabase } from "../config/supabase";
 import { AuthRequest } from "../middleware/auth.middleware";
 
-/**
- * Add a chapter to a course (auto-increment sequence_order)
- * Mentor must own the course
- */
+
 export async function addChapter(req: AuthRequest, res: Response) {
   try {
     const { courseId } = req.params;
@@ -56,7 +53,7 @@ export async function addChapter(req: AuthRequest, res: Response) {
       });
     }
 
-    // ✅ VERY IMPORTANT — send response
+    // VERY IMPORTANT — send response
     return res.status(201).json(data);
   } catch (err) {
     console.error("Unexpected chapter error:", err);
@@ -64,9 +61,7 @@ export async function addChapter(req: AuthRequest, res: Response) {
   }
 }
 
-/**
- * Get all chapters of a course (ordered)
- */
+
 export async function getChapters(req: AuthRequest, res: Response) {
   try {
     const { courseId } = req.params;

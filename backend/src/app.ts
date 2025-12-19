@@ -14,7 +14,7 @@ const app = express();
 
 app.use(express.json());
 
-// 🔹 Health check
+// Health check
 app.get("/health", async (_req: Request, res: Response) => {
   const { error } = await supabase.from("users").select("id").limit(1);
 

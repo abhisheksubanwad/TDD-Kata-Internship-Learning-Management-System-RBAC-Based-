@@ -5,9 +5,8 @@ let studentToken: string;
 const courseId = "04c8affe-b720-41ad-a2f2-405f9c755a17"; // Use existing course
 
 beforeAll(async () => {
-  // ---------------------------
+
   // Register and login student
-  // ---------------------------
   await request(app).post("/api/auth/register").send({
     name: "Student One",
     email: "student1@test.com",

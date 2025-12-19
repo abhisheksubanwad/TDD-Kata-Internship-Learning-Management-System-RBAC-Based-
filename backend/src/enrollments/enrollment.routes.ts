@@ -7,7 +7,7 @@ const router = Router();
 
 // Student enrollment
 router.post(
-  "/:courseId",           // ✅ MUST be courseId
+  "/:courseId",           
   authenticate,
   authorize(["student"]),
   enrollStudent
