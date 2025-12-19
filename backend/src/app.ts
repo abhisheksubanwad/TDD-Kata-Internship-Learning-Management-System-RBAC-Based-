@@ -7,6 +7,7 @@ import adminRoutes from "./admin/admin.routes";
 import courseRoutes from "./courses/course.routes";
 import chapterRoutes from "./chapters/chapter.routes";
 import enrollmentRoutes from "./enrollments/enrollment.routes";
+import cors from "cors";
 
 
 const app = express(); 
@@ -29,6 +30,12 @@ app.get("/health", async (_req: Request, res: Response) => {
     db: "connected",
   });
 });
+
+app.use(cors({
+  origin: "http://localhost:5173", // frontend origin
+  credentials: true,               // allow cookies if needed
+}));
+
 
 // Enrollments routs
 app.use("/api/enrollments", enrollmentRoutes);
