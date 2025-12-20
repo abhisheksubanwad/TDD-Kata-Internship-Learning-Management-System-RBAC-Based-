@@ -8,6 +8,7 @@ import courseRoutes from "./courses/course.routes";
 import chapterRoutes from "./chapters/chapter.routes";
 import enrollmentRoutes from "./enrollments/enrollment.routes";
 import cors from "cors";
+import progressRoutes from "./progress/progress.routes";
 
 
 const app = express(); 
@@ -36,6 +37,7 @@ app.use(cors({
   credentials: true,               // allow cookies if needed
 }));
 
+app.use("/api/progress", progressRoutes);
 
 // Enrollments routs
 app.use("/api/enrollments", enrollmentRoutes);
