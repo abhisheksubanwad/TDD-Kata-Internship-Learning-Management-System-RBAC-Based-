@@ -3,14 +3,24 @@ import { authenticate } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/role.middleware";
 import {
   createCourse,
-  getMyCourses,
+  getAllCourses,
+  getMentorCourses,
 } from "./course.controller";
 
 const router = Router();
 
-router.use(authenticate, authorize(["mentor"]));
+// STUDENT + MENTOR + ADMIN 
+router.get("/", authenticate, getAllCourses);
 
-router.post("/", createCourse);
-router.get("/my", getMyCourses);
+// MENTOR ONLY 
+router.post("/", authenticate, authorize(["mentor"]), createCourse);
+
+// MENTOR ONLY 
+router.get(
+  "/mentor",
+  authenticate,
+  authorize(["mentor"]),
+  getMentorCourses
+);
 
 export default router;

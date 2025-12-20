@@ -5,17 +5,17 @@ import Student from "./pages/Student";
 import Mentor from "./pages/Mentor";
 import Admin from "./pages/Admin";
 import Unauthorized from "./pages/Unauthorized";
+import MyCourses from "./pages/MyCourses";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <BrowserRouter>
-      {/* Navbar is here */}
       <Navbar />
 
       <Routes>
-        {/* Public routes */}
+        {/* Public */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
@@ -26,6 +26,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["student"]}>
               <Student />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/my-courses"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <MyCourses />
             </ProtectedRoute>
           }
         />

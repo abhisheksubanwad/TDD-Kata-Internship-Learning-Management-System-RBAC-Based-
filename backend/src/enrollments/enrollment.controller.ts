@@ -1,33 +1,43 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { supabase } from "../config/supabase";
 import { AuthRequest } from "../middleware/auth.middleware";
 
-export async function enrollStudent(req: AuthRequest, res: Response) {
-  const { courseId } = req.params;
-  const studentId = req.user!.userId;
+// POST /api/enrollments/:courseId
 
-  console.log("🔥 enrollStudent controller HIT");
-  console.log("PARAMS:", req.params);
+export const enrollStudent = async (req: AuthRequest, res: Response) => {
+  const studentId = req.user!.userId;
+  const { courseId } = req.params;
 
   if (!courseId) {
-    return res.status(400).json({ message: "Course ID missing" });
+    return res.status(400).json({ message: "Course ID required" });
   }
 
   const { data, error } = await supabase
     .from("enrollments")
-    .insert([
-      {
-        course_id: courseId,
-        student_id: studentId,
-      },
-    ])
+    .insert([{ student_id: studentId, course_id: courseId }])
     .select()
     .single();
 
   if (error) {
-    console.error("Enrollment insert error:", error);
     return res.status(400).json({ message: "Enrollment failed" });
   }
 
-  return res.status(201).json(data);
-}
+  res.status(201).json(data);
+};
+
+// GET /api/enrollments/me
+
+export const getMyEnrollments = async (req: AuthRequest, res: Response) => {
+  const studentId = req.user!.userId;
+
+  const { data, error } = await supabase
+    .from("enrollments")
+    .select("courses(id, title, description)")
+    .eq("student_id", studentId);
+
+  if (error) {
+    return res.status(500).json({ message: "Failed to fetch enrollments" });
+  }
+
+  res.json(data.map((e: any) => e.courses));
+};

@@ -6,25 +6,27 @@ const Navbar = () => {
   const navigate = useNavigate();
   const role = getRole();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   return (
-    <nav className="navbar">
-      <h3>LMS</h3>
+    <div className="navbar">
+      {/* Left side */}
+      <div className="navbar-title" onClick={() => navigate("/")}>
+        LMS Dashboard
+      </div>
 
-      <div className="nav-links">
+      {/* Right side links */}
+      <div className="navbar-links">
         {role === "student" && (
-          <button onClick={() => navigate("/student")}>Dashboard</button>
+          <>
+            <button onClick={() => navigate("/student")}>Dashboard</button>
+            <button onClick={() => navigate("/my-courses")}>My Courses</button>
+          </>
         )}
 
         {role === "mentor" && (
           <>
             <button onClick={() => navigate("/mentor")}>Dashboard</button>
-            <button onClick={() => navigate("/mentor/create-course")}>
-              Create Course
+            <button onClick={() => navigate("/mentor/courses")}>
+              My Courses
             </button>
           </>
         )}
@@ -33,11 +35,9 @@ const Navbar = () => {
           <button onClick={() => navigate("/admin")}>Admin Panel</button>
         )}
 
-        <button className="logout" onClick={handleLogout}>
-          Logout
-        </button>
+        <button onClick={logout}>Logout</button>
       </div>
-    </nav>
+    </div>
   );
 };
 

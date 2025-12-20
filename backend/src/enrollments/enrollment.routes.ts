@@ -1,16 +1,22 @@
 import { Router } from "express";
+import { enrollStudent, getMyEnrollments } from "./enrollment.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/role.middleware";
-import { enrollStudent } from "./enrollment.controller";
 
 const router = Router();
 
-// Student enrollment
 router.post(
-  "/:courseId",           
+  "/:courseId",
   authenticate,
   authorize(["student"]),
   enrollStudent
+);
+
+router.get(
+  "/me",
+  authenticate,
+  authorize(["student"]),
+  getMyEnrollments
 );
 
 export default router;
