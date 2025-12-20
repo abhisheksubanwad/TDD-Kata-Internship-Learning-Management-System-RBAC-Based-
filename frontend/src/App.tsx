@@ -1,17 +1,20 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import Login from "./auth/Login";
 import Register from "./auth/Register";
+
 import Student from "./pages/Student";
-import Mentor from "./pages/Mentor";
 import Admin from "./pages/Admin";
 import Unauthorized from "./pages/Unauthorized";
 import MyCourses from "./pages/MyCourses";
+import CourseDetails from "./pages/CourseDetails";
+
+import MentorDashboard from "./mentor/MentorDashboard";
+import MentorCourses from "./mentor/MentorCourses";
+import MentorCourseChapters from "./mentor/CourseChapters";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
-import CourseDetails from "./pages/CourseDetails";
-import CourseChapters from "./pages/CourseChapters";
-
-
 
 function App() {
   return (
@@ -19,12 +22,12 @@ function App() {
       <Navbar />
 
       <Routes>
-        {/* Public */}
+        {/* PUBLIC */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
 
-        {/* Student */}
+        {/* STUDENT */}
         <Route
           path="/student"
           element={
@@ -34,11 +37,10 @@ function App() {
           }
         />
 
-        {/* Courses */}
         <Route
           path="/my-courses"
           element={
-             <ProtectedRoute allowedRoles={["student"]}>
+            <ProtectedRoute allowedRoles={["student"]}>
               <MyCourses />
             </ProtectedRoute>
           }
@@ -48,32 +50,40 @@ function App() {
           path="/courses/:courseId"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
-            <CourseDetails />
-           </ProtectedRoute>
-          }
-        />
-       {/*Course Detail */}
-        <Route
-          path="/courses/:courseId"
-          element={
-            <ProtectedRoute allowedRoles={["student"]}>
-            <CourseChapters />
+              <CourseDetails />
             </ProtectedRoute>
           }
         />
 
-
-        {/* Mentor */}
+        {/* MENTOR */}
         <Route
           path="/mentor"
           element={
             <ProtectedRoute allowedRoles={["mentor"]}>
-              <Mentor />
+              <MentorDashboard />
             </ProtectedRoute>
           }
         />
 
-        {/* Admin */}
+        <Route
+          path="/mentor/courses"
+          element={
+            <ProtectedRoute allowedRoles={["mentor"]}>
+              <MentorCourses />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/mentor/courses/:courseId"
+          element={
+            <ProtectedRoute allowedRoles={["mentor"]}>
+              <MentorCourseChapters />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ADMIN */}
         <Route
           path="/admin"
           element={
@@ -83,7 +93,7 @@ function App() {
           }
         />
 
-        {/* Default */}
+        {/* FALLBACK */}
         <Route path="*" element={<Login />} />
       </Routes>
     </BrowserRouter>

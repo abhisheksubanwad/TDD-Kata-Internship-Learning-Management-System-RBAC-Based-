@@ -3,11 +3,14 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import "./Auth.css";
 
+type Role = "student" | "mentor" | "admin";
+
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("student");
+  const [role, setRole] = useState<Role>("student");
+
   const navigate = useNavigate();
 
   const handleRegister = async () => {
@@ -19,10 +22,10 @@ const Register = () => {
         role,
       });
 
-      alert("Registration successful");
+      alert("Registration successful. Please login.");
       navigate("/login");
-    } catch {
-      alert("Registration failed");
+    } catch (error: any) {
+      alert(error?.response?.data?.message || "Registration failed");
     }
   };
 
@@ -33,22 +36,25 @@ const Register = () => {
 
         <input
           placeholder="Name"
+          value={name}
           onChange={(e) => setName(e.target.value)}
         />
 
         <input
-          type="email"
           placeholder="Email"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
           type="password"
           placeholder="Password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <select onChange={(e) => setRole(e.target.value)}>
+        {/* ROLE SELECT */}
+        <select value={role} onChange={(e) => setRole(e.target.value as Role)}>
           <option value="student">Student</option>
           <option value="mentor">Mentor</option>
           <option value="admin">Admin</option>
@@ -57,7 +63,7 @@ const Register = () => {
         <button onClick={handleRegister}>Register</button>
 
         <div className="auth-footer">
-          Already have an account?{" "}
+          Already registered?{" "}
           <span onClick={() => navigate("/login")}>Login</span>
         </div>
       </div>

@@ -10,16 +10,21 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
+
+      // CLEAR OLD SESSION FIRST
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+
       const res = await api.post("/auth/login", {
         email,
         password,
       });
 
-      // ✅ SAVE AUTH DATA
+      // SAVE AUTH DATA
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
 
-      // ✅ ROLE-BASED REDIRECT
+      // ROLE-BASED REDIRECT
       if (res.data.role === "admin") navigate("/admin");
       else if (res.data.role === "mentor") navigate("/mentor");
       else navigate("/student");
