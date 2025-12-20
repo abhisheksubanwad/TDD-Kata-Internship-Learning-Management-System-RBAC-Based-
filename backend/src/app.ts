@@ -9,6 +9,8 @@ import chapterRoutes from "./chapters/chapter.routes";
 import enrollmentRoutes from "./enrollments/enrollment.routes";
 import cors from "cors";
 import progressRoutes from "./progress/progress.routes";
+import certificateRoutes from "./certificates/certificate.routes";
+
 
 
 const app = express(); 
@@ -39,6 +41,7 @@ app.use(cors({
 
 app.use("/api/progress", progressRoutes);
 
+app.use("/api/certificates", certificateRoutes);
 // Enrollments routs
 app.use("/api/enrollments", enrollmentRoutes);
 

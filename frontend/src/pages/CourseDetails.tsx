@@ -12,7 +12,10 @@ interface Chapter {
 
 const CourseDetails = () => {
   const { courseId } = useParams<{ courseId: string }>();
+
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [progress, setProgress] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchChapters = async () => {
@@ -21,13 +24,21 @@ const CourseDetails = () => {
     setLoading(false);
   };
 
+  const fetchProgress = async () => {
+    const res = await api.get(`/progress/course/${courseId}`);
+    setProgress(res.data.progress);
+    setIsCompleted(res.data.isCompleted);
+  };
+
   useEffect(() => {
     fetchChapters();
+    fetchProgress();
   }, [courseId]);
 
   const markCompleted = async (chapterId: string) => {
-    await api.post(`/chapters/complete/${chapterId}`);
-    fetchChapters(); // refresh lock state
+    await api.post(`/progress/${chapterId}`);
+    await fetchChapters();
+    await fetchProgress();
   };
 
   if (loading) return <p>Loading chapters...</p>;
@@ -35,6 +46,57 @@ const CourseDetails = () => {
   return (
     <div style={{ padding: "20px" }}>
       <h2>Course Content</h2>
+
+      {/* ✅ PROGRESS BAR — ADD HERE */}
+      <div style={{ marginBottom: "20px" }}>
+        <h3>Progress: {progress}%</h3>
+
+        <div
+          style={{
+            height: "10px",
+            background: "#e5e7eb",
+            borderRadius: "5px",
+          }}
+        >
+          <div
+            style={{
+              width: `${progress}%`,
+              height: "100%",
+              background: "#22c55e",
+              borderRadius: "5px",
+            }}
+          />
+        </div>
+
+        {isCompleted && (
+          <p style={{ color: "green", marginTop: "10px" }}>
+            🎉 Course Completed!
+          </p>
+        )}
+      </div>
+
+      {isCompleted && (
+  <button
+    onClick={() =>
+      window.open(
+        `${import.meta.env.VITE_API_URL}/certificates/${courseId}`,
+        "_blank"
+      )
+    }
+    style={{
+      marginTop: "15px",
+      padding: "8px 16px",
+      backgroundColor: "#16a34a",
+      color: "white",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+    }}
+  >
+    🎓 Download Certificate
+  </button>
+)}
+
 
       {chapters.map((ch, index) => (
         <div
