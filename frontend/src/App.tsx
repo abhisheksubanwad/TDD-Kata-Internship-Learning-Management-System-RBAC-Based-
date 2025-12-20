@@ -8,6 +8,10 @@ import Unauthorized from "./pages/Unauthorized";
 import MyCourses from "./pages/MyCourses";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
+import CourseDetails from "./pages/CourseDetails";
+import CourseChapters from "./pages/CourseChapters";
+
+
 
 function App() {
   return (
@@ -39,6 +43,25 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/courses/:courseId"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+            <CourseDetails />
+           </ProtectedRoute>
+          }
+        />
+       {/*Course Detail */}
+        <Route
+          path="/courses/:courseId"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+            <CourseChapters />
+            </ProtectedRoute>
+          }
+        />
+
 
         {/* Mentor */}
         <Route

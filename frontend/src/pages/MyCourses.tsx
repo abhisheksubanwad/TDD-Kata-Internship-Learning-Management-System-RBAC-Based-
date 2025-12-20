@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
 interface Course {
@@ -10,6 +11,7 @@ interface Course {
 const MyCourses = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMyCourses = async () => {
@@ -37,7 +39,11 @@ const MyCourses = () => {
       ) : (
         <ul>
           {courses.map((course) => (
-            <li key={course.id} style={{ marginBottom: "10px" }}>
+            <li
+              key={course.id}
+              style={{ marginBottom: "10px", cursor: "pointer" }}
+              onClick={() => navigate(`/courses/${course.id}`)}
+            >
               <strong>{course.title}</strong>
               <p>{course.description}</p>
             </li>
