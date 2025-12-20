@@ -9,9 +9,10 @@ import Unauthorized from "./pages/Unauthorized";
 import MyCourses from "./pages/MyCourses";
 import CourseDetails from "./pages/CourseDetails";
 
-import MentorDashboard from "./mentor/MentorDashboard";
+import Mentor from "./pages/Mentor";
 import MentorCourses from "./mentor/MentorCourses";
-import MentorCourseChapters from "./mentor/CourseChapters";
+import CreateCourse from "./mentor/CreateCourse";
+import CourseChapters from "./mentor/CourseChapters"; 
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
@@ -54,8 +55,44 @@ function App() {
             </ProtectedRoute>
           }
         />
+{/* Mentor */}
+<Route
+  path="/mentor"
+  element={
+    <ProtectedRoute allowedRoles={["mentor"]}>
+      <Mentor />
+    </ProtectedRoute>
+  }
+/>
 
-        {/* MENTOR */}
+<Route
+  path="/mentor/courses"
+  element={
+    <ProtectedRoute allowedRoles={["mentor"]}>
+      <MentorCourses />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/mentor/create-course"
+  element={
+    <ProtectedRoute allowedRoles={["mentor"]}>
+      <CreateCourse />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/mentor/courses/:courseId"
+  element={
+    <ProtectedRoute allowedRoles={["mentor"]}>
+      <CourseChapters />
+    </ProtectedRoute>
+  }
+/>
+
+        {/* MENTOR
         <Route
           path="/mentor"
           element={
@@ -63,17 +100,17 @@ function App() {
               <MentorDashboard />
             </ProtectedRoute>
           }
-        />
+        /> */}
 
-        <Route
+        {/* <Route
           path="/mentor/courses"
           element={
             <ProtectedRoute allowedRoles={["mentor"]}>
               <MentorCourses />
             </ProtectedRoute>
           }
-        />
-
+        /> */}
+{/* 
         <Route
           path="/mentor/courses/:courseId"
           element={
@@ -81,7 +118,7 @@ function App() {
               <MentorCourseChapters />
             </ProtectedRoute>
           }
-        />
+        /> */}
 
         {/* ADMIN */}
         <Route

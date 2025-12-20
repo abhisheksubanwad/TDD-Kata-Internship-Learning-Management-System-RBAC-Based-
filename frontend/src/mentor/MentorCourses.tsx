@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMentorCourses } from "../api/mentor";
-
+import api from "../api/axios";
 
 interface Course {
   id: string;
@@ -14,28 +13,32 @@ const MentorCourses = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getMentorCourses().then(res => setCourses(res.data));
+    api.get("/courses/mentor").then((res) => {
+      setCourses(res.data);
+    });
   }, []);
 
   return (
-    <>
-      <h3>My Courses</h3>
+    <div style={{ padding: "20px" }}>
+      <h2>My Courses</h2>
 
-      {courses.length === 0 && <p>No courses yet</p>}
-
-      <ul>
-        {courses.map(course => (
-          <li
-            key={course.id}
-            style={{ cursor: "pointer", marginBottom: "10px" }}
-            onClick={() => navigate(`/mentor/courses/${course.id}`)}
-          >
-            <strong>{course.title}</strong>
-            <p>{course.description}</p>
-          </li>
-        ))}
-      </ul>
-    </>
+      {courses.length === 0 ? (
+        <p>No courses yet</p>
+      ) : (
+        <ul>
+          {courses.map((course) => (
+            <li
+              key={course.id}
+              style={{ cursor: "pointer", marginBottom: "10px" }}
+              onClick={() => navigate(`/mentor/courses/${course.id}`)}
+            >
+              <strong>{course.title}</strong>
+              <p>{course.description}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 };
 

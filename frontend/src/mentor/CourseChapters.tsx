@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getCourseChapters, addChapter } from "../api/mentor";
-
+import api from "../api/axios";
 
 interface Chapter {
   id: string;
@@ -15,52 +14,48 @@ const CourseChapters = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  const loadChapters = async () => {
-    const res = await getCourseChapters(courseId!);
-    setChapters(res.data);
-  };
-
   useEffect(() => {
-    loadChapters();
-  }, []);
+    api.get(`/chapters/${courseId}`).then((res) => {
+      setChapters(res.data);
+    });
+  }, [courseId]);
 
-  const handleAdd = async () => {
-    await addChapter(courseId!, title, content);
+  const addChapter = async () => {
+    const res = await api.post(`/chapters/${courseId}`, {
+      title,
+      content,
+    });
+    setChapters([...chapters, res.data]);
     setTitle("");
     setContent("");
-    loadChapters();
   };
 
   return (
     <div style={{ padding: "20px" }}>
-      <h3>Chapters</h3>
-
-      <ul>
-        {chapters.map(ch => (
-          <li key={ch.id}>
-            <strong>{ch.title}</strong>
-            <p>{ch.content}</p>
-          </li>
-        ))}
-      </ul>
-
-      <hr />
-
-      <h4>Add Chapter</h4>
+      <h2>Chapters</h2>
 
       <input
-        placeholder="Title"
+        placeholder="Chapter title"
         value={title}
-        onChange={e => setTitle(e.target.value)}
+        onChange={(e) => setTitle(e.target.value)}
       />
 
       <textarea
         placeholder="Content"
         value={content}
-        onChange={e => setContent(e.target.value)}
+        onChange={(e) => setContent(e.target.value)}
       />
 
-      <button onClick={handleAdd}>Add Chapter</button>
+      <button onClick={addChapter}>Add Chapter</button>
+
+      <ul>
+        {chapters.map((c) => (
+          <li key={c.id}>
+            <strong>{c.title}</strong>
+            <p>{c.content}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
