@@ -1,12 +1,15 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/role.middleware";
-import { addChapter, getChapters } from "./chapter.controller";
+import {
+  addChapter,
+  getChapters,
+  completeChapter,
+} from "./chapter.controller";
 
 const router = Router();
 
-
-// READ chapters Student + Mentor
+// Student + Mentor can read
 router.get(
   "/:courseId",
   authenticate,
@@ -14,9 +17,15 @@ router.get(
   getChapters
 );
 
+// Student marks chapter complete
+router.post(
+  "/complete/:chapterId",
+  authenticate,
+  authorize(["student"]),
+  completeChapter
+);
 
-// CREATE chapters Mentor only
-
+// Mentor adds chapter
 router.post(
   "/:courseId",
   authenticate,

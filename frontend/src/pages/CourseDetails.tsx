@@ -6,53 +6,28 @@ interface Chapter {
   id: string;
   title: string;
   content: string;
+  isCompleted: boolean;
+  isUnlocked: boolean;
 }
 
 const CourseDetails = () => {
   const { courseId } = useParams<{ courseId: string }>();
-
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [completedChapters, setCompletedChapters] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Fetch chapters
-  useEffect(() => {
-    const fetchChapters = async () => {
-      try {
-        const res = await api.get(`/chapters/${courseId}`);
-        setChapters(res.data);
-      } catch (error) {
-        console.error(error);
-        alert("Failed to load chapters");
-      }
-    };
+  const fetchChapters = async () => {
+    const res = await api.get(`/chapters/${courseId}`);
+    setChapters(res.data);
+    setLoading(false);
+  };
 
+  useEffect(() => {
     fetchChapters();
   }, [courseId]);
 
-  // 🔹 Fetch completed chapters
-  useEffect(() => {
-    const fetchProgress = async () => {
-      try {
-        const res = await api.get("/progress/me");
-        setCompletedChapters(res.data);
-      } catch (error) {
-        console.error("Failed to fetch progress");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProgress();
-  }, []);
-
   const markCompleted = async (chapterId: string) => {
-    try {
-      await api.post(`/progress/${chapterId}`);
-      setCompletedChapters((prev) => [...prev, chapterId]);
-    } catch {
-      alert("Failed to mark chapter as completed");
-    }
+    await api.post(`/chapters/complete/${chapterId}`);
+    fetchChapters(); // refresh lock state
   };
 
   if (loading) return <p>Loading chapters...</p>;
@@ -61,48 +36,48 @@ const CourseDetails = () => {
     <div style={{ padding: "20px" }}>
       <h2>Course Content</h2>
 
-      {chapters.length === 0 ? (
-        <p>No chapters yet.</p>
-      ) : (
-        chapters.map((ch, index) => {
-          const isCompleted = completedChapters.includes(ch.id);
+      {chapters.map((ch, index) => (
+        <div
+          key={ch.id}
+          style={{
+            marginBottom: "20px",
+            padding: "15px",
+            border: "1px solid #e5e7eb",
+            borderRadius: "6px",
+            backgroundColor: ch.isCompleted
+              ? "#ecfdf5"
+              : ch.isUnlocked
+              ? "#ffffff"
+              : "#f3f4f6",
+            opacity: ch.isUnlocked ? 1 : 0.6,
+          }}
+        >
+          <h4>
+            {index + 1}. {ch.title}
+            {ch.isCompleted && " ✅"}
+            {!ch.isUnlocked && " 🔒"}
+          </h4>
 
-          return (
-            <div
-              key={ch.id}
+          {ch.isUnlocked && <p>{ch.content}</p>}
+
+          {ch.isUnlocked && !ch.isCompleted && (
+            <button
+              onClick={() => markCompleted(ch.id)}
               style={{
-                marginBottom: "20px",
-                padding: "15px",
-                border: "1px solid #e5e7eb",
-                borderRadius: "6px",
-                backgroundColor: isCompleted ? "#ecfdf5" : "#fff",
+                marginTop: "10px",
+                padding: "6px 12px",
+                backgroundColor: "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
               }}
             >
-              <h4>
-                {index + 1}. {ch.title}
-              </h4>
-
-              <p>{ch.content}</p>
-
-              <button
-                disabled={isCompleted}
-                onClick={() => markCompleted(ch.id)}
-                style={{
-                  marginTop: "10px",
-                  padding: "6px 12px",
-                  backgroundColor: isCompleted ? "#22c55e" : "#3b82f6",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: isCompleted ? "not-allowed" : "pointer",
-                }}
-              >
-                {isCompleted ? "Completed ✅" : "Mark as Completed"}
-              </button>
-            </div>
-          );
-        })
-      )}
+              Mark as Completed
+            </button>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
