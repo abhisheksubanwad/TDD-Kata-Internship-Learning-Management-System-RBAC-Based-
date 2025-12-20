@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./auth/Login";
 import Register from "./auth/Register";
 
+import AdminDashboard from "./admin/AdminDashboard";
 import Student from "./pages/Student";
 import Admin from "./pages/Admin";
 import Unauthorized from "./pages/Unauthorized";
@@ -102,35 +103,6 @@ function App() {
   }
 />
 
-
-        {/* MENTOR
-        <Route
-          path="/mentor"
-          element={
-            <ProtectedRoute allowedRoles={["mentor"]}>
-              <MentorDashboard />
-            </ProtectedRoute>
-          }
-        /> */}
-
-        {/* <Route
-          path="/mentor/courses"
-          element={
-            <ProtectedRoute allowedRoles={["mentor"]}>
-              <MentorCourses />
-            </ProtectedRoute>
-          }
-        /> */}
-{/* 
-        <Route
-          path="/mentor/courses/:courseId"
-          element={
-            <ProtectedRoute allowedRoles={["mentor"]}>
-              <MentorCourseChapters />
-            </ProtectedRoute>
-          }
-        /> */}
-
         {/* ADMIN */}
         <Route
           path="/admin"
@@ -140,6 +112,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+  path="/admin"
+  element={
+    <ProtectedRoute allowedRoles={["admin"]}>
+      <AdminDashboard />
+    </ProtectedRoute>
+  }
+/>
+
 
         {/* FALLBACK */}
         <Route path="*" element={<Login />} />
