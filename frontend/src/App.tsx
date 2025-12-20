@@ -9,6 +9,7 @@ import Unauthorized from "./pages/Unauthorized";
 import MyCourses from "./pages/MyCourses";
 import CourseDetails from "./pages/CourseDetails";
 
+import MentorAnalytics from "./mentor/MentorAnalytics";
 import Mentor from "./pages/Mentor";
 import MentorCourses from "./mentor/MentorCourses";
 import CreateCourse from "./mentor/CreateCourse";
@@ -91,6 +92,16 @@ function App() {
     </ProtectedRoute>
   }
 />
+
+<Route
+  path="/mentor/analytics"
+  element={
+    <ProtectedRoute allowedRoles={["mentor"]}>
+      <MentorAnalytics />
+    </ProtectedRoute>
+  }
+/>
+
 
         {/* MENTOR
         <Route
