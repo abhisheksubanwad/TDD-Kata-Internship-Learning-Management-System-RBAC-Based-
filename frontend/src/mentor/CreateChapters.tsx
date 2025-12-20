@@ -5,30 +5,30 @@ import api from "../api/axios";
 interface Chapter {
   id: string;
   title: string;
-  content: string;
+  sequence_order: number;
 }
 
-const CourseChapters = () => {
+const CreateChapters = () => {
   const { courseId } = useParams();
-  const [chapters, setChapters] = useState<Chapter[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [chapters, setChapters] = useState<Chapter[]>([]);
 
-  useEffect(() => {
-    api.get(`/chapters/${courseId}`).then((res) => {
-      setChapters(res.data);
-    });
-  }, [courseId]);
+  const fetchChapters = async () => {
+    const res = await api.get(`/chapters/${courseId}`);
+    setChapters(res.data);
+  };
 
   const addChapter = async () => {
-    const res = await api.post(`/chapters/${courseId}`, {
-      title,
-      content,
-    });
-    setChapters([...chapters, res.data]);
+    await api.post(`/chapters/${courseId}`, { title, content });
     setTitle("");
     setContent("");
+    fetchChapters();
   };
+
+  useEffect(() => {
+    fetchChapters();
+  }, []);
 
   return (
     <div style={{ padding: "20px" }}>
@@ -51,8 +51,7 @@ const CourseChapters = () => {
       <ul>
         {chapters.map((c) => (
           <li key={c.id}>
-            <strong>{c.title}</strong>
-            <p>{c.content}</p>
+            {c.sequence_order}. {c.title}
           </li>
         ))}
       </ul>
@@ -60,4 +59,4 @@ const CourseChapters = () => {
   );
 };
 
-export default CourseChapters;
+export default CreateChapters;

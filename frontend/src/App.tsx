@@ -12,7 +12,7 @@ import CourseDetails from "./pages/CourseDetails";
 import Mentor from "./pages/Mentor";
 import MentorCourses from "./mentor/MentorCourses";
 import CreateCourse from "./mentor/CreateCourse";
-import CourseChapters from "./mentor/CourseChapters"; 
+import CourseChapters from "./mentor/CreateChapters"; 
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";

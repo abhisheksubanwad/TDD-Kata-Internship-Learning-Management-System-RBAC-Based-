@@ -26,14 +26,14 @@ const MentorCourses = () => {
         <p>No courses yet</p>
       ) : (
         <ul>
-          {courses.map((course) => (
+          {courses.map((c) => (
             <li
-              key={course.id}
+              key={c.id}
               style={{ cursor: "pointer", marginBottom: "10px" }}
-              onClick={() => navigate(`/mentor/courses/${course.id}`)}
+              onClick={() => navigate(`/mentor/courses/${c.id}`)}
             >
-              <strong>{course.title}</strong>
-              <p>{course.description}</p>
+              <strong>{c.title}</strong>
+              <p>{c.description}</p>
             </li>
           ))}
         </ul>

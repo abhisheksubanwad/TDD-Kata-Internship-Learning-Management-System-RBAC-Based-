@@ -7,7 +7,7 @@ const CreateCourse = () => {
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
 
-  const handleCreate = async () => {
+  const createCourse = async () => {
     await api.post("/courses", { title, description });
     navigate("/mentor/courses");
   };
@@ -26,7 +26,7 @@ const CreateCourse = () => {
         onChange={(e) => setDescription(e.target.value)}
       />
 
-      <button onClick={handleCreate}>Create</button>
+      <button onClick={createCourse}>Create</button>
     </div>
   );
 };
