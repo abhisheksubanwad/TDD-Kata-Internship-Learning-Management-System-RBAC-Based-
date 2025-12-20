@@ -30,10 +30,11 @@ function App() {
           }
         />
 
+        {/* Courses */}
         <Route
           path="/my-courses"
           element={
-            <ProtectedRoute allowedRoles={["student"]}>
+             <ProtectedRoute allowedRoles={["student"]}>
               <MyCourses />
             </ProtectedRoute>
           }

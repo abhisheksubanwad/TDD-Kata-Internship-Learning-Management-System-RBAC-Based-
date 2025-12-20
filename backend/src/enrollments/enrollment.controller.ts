@@ -26,18 +26,27 @@ export const enrollStudent = async (req: AuthRequest, res: Response) => {
 };
 
 // GET /api/enrollments/me
-
 export const getMyEnrollments = async (req: AuthRequest, res: Response) => {
   const studentId = req.user!.userId;
 
   const { data, error } = await supabase
     .from("enrollments")
-    .select("courses(id, title, description)")
+    .select(
+      `
+      course:courses (
+        id,
+        title,
+        description
+      )
+    `
+    )
     .eq("student_id", studentId);
 
   if (error) {
     return res.status(500).json({ message: "Failed to fetch enrollments" });
   }
 
-  res.json(data.map((e: any) => e.courses));
+  // ✅ Return clean course array
+  res.json(data.map((e: any) => e.course));
 };
+
