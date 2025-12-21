@@ -6,5 +6,10 @@
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/jsonwebtoken": "^9.0.10"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "postinstall": "npm run build"
   }
 }
