@@ -10,6 +10,7 @@ import Unauthorized from "./pages/Unauthorized";
 import MyCourses from "./pages/MyCourses";
 import CourseDetails from "./pages/CourseDetails";
 
+import MentorCourseProgress from "./mentor/MentorCourseProgress";
 import AssignCourse from "./mentor/AssignCourse";
 import MentorAnalytics from "./mentor/MentorAnalytics";
 import Mentor from "./pages/Mentor";
@@ -112,6 +113,16 @@ function App() {
     </ProtectedRoute>
   }
 />
+
+<Route
+  path="/mentor/courses/:courseId/progress"
+  element={
+    <ProtectedRoute allowedRoles={["mentor"]}>
+      <MentorCourseProgress />
+    </ProtectedRoute>
+  }
+/>
+
 
 
         {/* ADMIN */}

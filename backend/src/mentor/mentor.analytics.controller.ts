@@ -19,32 +19,58 @@ export async function getMentorAnalytics(
 
   const analytics: any[] = [];
 
-  for (const course of courses || []) {
+  for (const course of courses ?? []) {
+    /* total chapters */
     const { count: totalChapters } = await supabase
       .from("chapters")
       .select("*", { count: "exact", head: true })
       .eq("course_id", course.id);
 
-    const { data: students } = await supabase
-      .from("course_students")
-      .select("student_id, users(name)")
+    /* enrolled students */
+    const { data: enrollments } = await supabase
+      .from("enrollments")
+      .select(
+        `
+        student:users (
+          id,
+          name,
+          email
+        )
+      `
+      )
       .eq("course_id", course.id);
 
-    for (const s of students || []) {
+    for (const e of enrollments ?? []) {
+      // ✅ FIX HERE
+      const student = e.student?.[0];
+      if (!student) continue;
+
+      /* completed chapters (for this course only) */
+      const { data: chapterIds } = await supabase
+        .from("chapters")
+        .select("id")
+        .eq("course_id", course.id);
+
       const { count: completed } = await supabase
         .from("chapter_progress")
         .select("*", { count: "exact", head: true })
-        .eq("student_id", s.student_id)
-        .eq("completed", true);
+        .eq("student_id", student.id)
+        .in(
+          "chapter_id",
+          chapterIds?.map(c => c.id) ?? []
+        );
 
       const progress =
-        totalChapters && completed
-          ? Math.round((completed / totalChapters) * 100)
+        totalChapters && totalChapters > 0
+          ? Math.round(((completed || 0) / totalChapters) * 100)
           : 0;
 
       analytics.push({
+        courseId: course.id,
         courseTitle: course.title,
-        studentName: s.users?.[0]?.name ?? "Unknown",
+        studentId: student.id,
+        studentName: student.name,
+        studentEmail: student.email,
         completedChapters: completed || 0,
         totalChapters: totalChapters || 0,
         progress,
