@@ -1,16 +1,25 @@
 import { Router } from "express";
-import { enrollStudent, getMyEnrollments } from "./enrollment.controller";
+import {
+  assignCourseToStudent,
+  getMyEnrollments,
+} from "./enrollment.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/role.middleware";
 
 const router = Router();
 
+
+// MENTOR → ASSIGN COURSE
+
 router.post(
-  "/:courseId",
+  "/assign",
   authenticate,
-  authorize(["student"]),
-  enrollStudent
+  authorize(["mentor"]),
+  assignCourseToStudent
 );
+
+
+// STUDENT → VIEW ASSIGNED COURSES
 
 router.get(
   "/me",

@@ -1,32 +1,57 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { supabase } from "../config/supabase";
 import { AuthRequest } from "../middleware/auth.middleware";
 
-// POST /api/enrollments/:courseId
 
-export const enrollStudent = async (req: AuthRequest, res: Response) => {
-  const studentId = req.user!.userId;
-  const { courseId } = req.params;
+// MENTOR → ASSIGN COURSE TO STUDENT
 
-  if (!courseId) {
-    return res.status(400).json({ message: "Course ID required" });
+export const assignCourseToStudent = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  const mentorId = req.user!.userId;
+  const { courseId, studentId } = req.body;
+
+  if (!courseId || !studentId) {
+    return res
+      .status(400)
+      .json({ message: "courseId and studentId are required" });
   }
 
-  const { data, error } = await supabase
-    .from("enrollments")
-    .insert([{ student_id: studentId, course_id: courseId }])
-    .select()
+//   Check mentor owns this course
+  const { data: course, error: courseError } = await supabase
+    .from("courses")
+    .select("id")
+    .eq("id", courseId)
+    .eq("mentor_id", mentorId)
     .single();
 
-  if (error) {
-    return res.status(400).json({ message: "Enrollment failed" });
+  if (courseError || !course) {
+    return res.status(403).json({ message: "Not your course" });
   }
 
-  res.status(201).json(data);
+// Assign course 
+  const { error } = await supabase.from("enrollments").insert({
+    student_id: studentId,
+    course_id: courseId,
+  });
+
+  if (error) {
+    return res.status(400).json({ message: error.message });
+  }
+
+  return res.status(201).json({
+    message: "Course assigned successfully",
+  });
 };
 
-// GET /api/enrollments/me
-export const getMyEnrollments = async (req: AuthRequest, res: Response) => {
+
+// STUDENT → VIEW MY ASSIGNED COURSES
+
+export const getMyEnrollments = async (
+  req: AuthRequest,
+  res: Response
+) => {
   const studentId = req.user!.userId;
 
   const { data, error } = await supabase
@@ -43,10 +68,11 @@ export const getMyEnrollments = async (req: AuthRequest, res: Response) => {
     .eq("student_id", studentId);
 
   if (error) {
-    return res.status(500).json({ message: "Failed to fetch enrollments" });
+    return res
+      .status(500)
+      .json({ message: "Failed to fetch enrollments" });
   }
 
-  // ✅ Return clean course array
-  res.json(data.map((e: any) => e.course));
+  // Return clean array of courses
+  return res.json(data.map((e: any) => e.course));
 };
-
