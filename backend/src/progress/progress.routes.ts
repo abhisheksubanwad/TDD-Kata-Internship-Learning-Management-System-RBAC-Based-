@@ -3,7 +3,7 @@ import { authenticate } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/role.middleware";
 import {
   markChapterCompleted,
-  getMyProgress,
+  getCourseProgress,
 } from "./progress.controller";
 
 const router = Router();
@@ -11,6 +11,6 @@ const router = Router();
 router.use(authenticate, authorize(["student"]));
 
 router.post("/:chapterId", markChapterCompleted);
-router.get("/me", getMyProgress);
+router.get("/course/:courseId", getCourseProgress);
 
 export default router;

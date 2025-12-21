@@ -2,112 +2,93 @@ import { Response } from "express";
 import { supabase } from "../config/supabase";
 import { AuthRequest } from "../middleware/auth.middleware";
 
-/**
- * MARK CHAPTER AS COMPLETED
- * Enforces strict sequence
- * Student cannot skip chapters
- */
+// MARK CHAPTER COMPLETED
 export async function markChapterCompleted(
   req: AuthRequest,
   res: Response
 ) {
-  try {
-    const studentId = req.user!.userId;
-    const { chapterId } = req.params;
+  const studentId = req.user!.userId;
+  const { chapterId } = req.params;
 
-    // Get chapter info
-    const { data: chapter, error: chapterError } = await supabase
+  // Get chapter info
+  const { data: chapter } = await supabase
+    .from("chapters")
+    .select("id, sequence_order, course_id")
+    .eq("id", chapterId)
+    .single();
+
+  if (!chapter) {
+    return res.status(404).json({ message: "Chapter not found" });
+  }
+
+  // Check previous chapter completion
+  if (chapter.sequence_order > 1) {
+    const { data: prevChapter } = await supabase
       .from("chapters")
-      .select("id, course_id, sequence_order")
-      .eq("id", chapterId)
+      .select("id")
+      .eq("course_id", chapter.course_id)
+      .eq("sequence_order", chapter.sequence_order - 1)
       .single();
 
-    if (chapterError || !chapter) {
-      return res.status(404).json({ message: "Chapter not found" });
-    }
-
-    // If not first chapter check previous chapter completion
-    if (chapter.sequence_order > 1) {
-      const { data: prevChapter } = await supabase
-        .from("chapters")
-        .select("id")
-        .eq("course_id", chapter.course_id)
-        .eq("sequence_order", chapter.sequence_order - 1)
-        .single();
-
-      if (!prevChapter) {
-        return res.status(400).json({
-          message: "Previous chapter missing",
-        });
-      }
-
-      const { data: progress } = await supabase
-        .from("chapter_progress")
-        .select("*")
-        .eq("student_id", studentId)
-        .eq("chapter_id", prevChapter.id)
-        .eq("completed", true)
-        .maybeSingle();
-
-      if (!progress) {
-        return res.status(403).json({
-          message: "Complete previous chapter first",
-        });
-      }
-    }
-
-    // Mark chapter completed
-    const { error } = await supabase
+    const { data: prevProgress } = await supabase
       .from("chapter_progress")
-      .upsert({
-        student_id: studentId,
-        chapter_id: chapterId,
-        completed: true,
-      });
+      .select("id")
+      .eq("student_id", studentId)
+      .eq("chapter_id", prevChapter!.id)
+      .eq("completed", true)
+      .single();
 
-    if (error) {
-      return res.status(400).json({
-        message: "Failed to update progress",
-      });
+    if (!prevProgress) {
+      return res
+        .status(403)
+        .json({ message: "Complete previous chapter first" });
     }
-
-    return res.json({
-      message: "Chapter marked as completed",
-    });
-  } catch (err) {
-    console.error("Progress error:", err);
-    return res.status(500).json({
-      message: "Internal server error",
-    });
   }
+
+  // Mark completed
+  const { error } = await supabase
+    .from("chapter_progress")
+    .upsert({
+      student_id: studentId,
+      chapter_id: chapterId,
+      completed: true,
+    });
+
+  if (error) {
+    return res.status(400).json({ message: "Failed to update progress" });
+  }
+
+  res.json({ message: "Chapter marked as completed" });
 }
 
-// GET STUDENT PROGRESS
-
-export async function getMyProgress(
+// COURSE PROGRESS
+export async function getCourseProgress(
   req: AuthRequest,
   res: Response
 ) {
-  try {
-    const studentId = req.user!.userId;
+  const studentId = req.user!.userId;
+  const { courseId } = req.params;
 
-    const { data, error } = await supabase
-      .from("chapter_progress")
-      .select("chapter_id")
-      .eq("student_id", studentId)
-      .eq("completed", true);
+  // Total chapters
+  const { count: totalChapters } = await supabase
+    .from("chapters")
+    .select("*", { count: "exact", head: true })
+    .eq("course_id", courseId);
 
-    if (error) {
-      return res.status(500).json({
-        message: "Failed to fetch progress",
-      });
-    }
+  // Completed chapters
+  const { count: completedChapters } = await supabase
+    .from("chapter_progress")
+    .select("*", { count: "exact", head: true })
+    .eq("student_id", studentId)
+    .eq("completed", true);
 
-    return res.json(data.map((p) => p.chapter_id));
-  } catch (err) {
-    console.error("Get progress error:", err);
-    return res.status(500).json({
-      message: "Internal server error",
-    });
-  }
+  const progress =
+    totalChapters && totalChapters > 0
+      ? Math.round((completedChapters! / totalChapters) * 100)
+      : 0;
+
+  res.json({
+    progress,
+    isCompleted: progress === 100,
+  });
 }

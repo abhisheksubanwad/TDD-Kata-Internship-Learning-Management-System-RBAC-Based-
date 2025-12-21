@@ -56,51 +56,41 @@ export async function addChapter(req: AuthRequest, res: Response) {
 // STUDENT: GET CHAPTERS (LOCKED)
 
 export async function getChapters(req: AuthRequest, res: Response) {
-  try {
-    const { courseId } = req.params;
-    const studentId = req.user!.userId;
+  const studentId = req.user!.userId;
+  const { courseId } = req.params;
 
-    // Fetch chapters
-    const { data: chapters } = await supabase
-      .from("chapters")
-      .select("*")
-      .eq("course_id", courseId)
-      .order("sequence_order", { ascending: true });
+  const { data: chapters } = await supabase
+    .from("chapters")
+    .select("*")
+    .eq("course_id", courseId)
+    .order("sequence_order", { ascending: true });
 
-    if (!chapters) {
-      return res.json([]);
-    }
+  const { data: progress } = await supabase
+    .from("chapter_progress")
+    .select("chapter_id")
+    .eq("student_id", studentId)
+    .eq("completed", true);
 
-    // Fetch completed chapters
-    const { data: progress } = await supabase
-      .from("chapter_progress")
-      .select("chapter_id")
-      .eq("student_id", studentId);
+  const completedIds = progress?.map(p => p.chapter_id) || [];
 
-    const completedSet = new Set(
-      progress?.map((p) => p.chapter_id) || []
-    );
+  let unlocked = true;
 
-    // Build strict sequence response
-    const response = chapters.map((chapter, index) => {
-      const isCompleted = completedSet.has(chapter.id);
+  const result = chapters!.map(ch => {
+    const isCompleted = completedIds.includes(ch.id);
+    const isUnlocked = unlocked;
 
-      const isUnlocked =
-        index === 0 ||
-        completedSet.has(chapters[index - 1].id);
+    if (!isCompleted) unlocked = false;
 
-      return {
-        ...chapter,
-        isCompleted,
-        isUnlocked,
-      };
-    });
+    return {
+      ...ch,
+      isCompleted,
+      isUnlocked,
+    };
+  });
 
-    return res.json(response);
-  } catch {
-    return res.status(500).json({ message: "Internal server error" });
-  }
+  res.json(result);
 }
+
 
 // STUDENT: COMPLETE CHAPTER
 
